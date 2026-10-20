@@ -1,0 +1,44 @@
+<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex"><title>Aimpire neste</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@72..100,700..900&family=Montserrat:wght@500;600;700&display=swap">
+<style>
+/* Testmeny for forhåndsvisningen (#248): én kolonne, én stor trykkflate per ting founder skal prøve. */
+:root{--bunn:#08080B;--flate:#14131B;--tekst:#F4F2F8;--dempet:#A9A6B8;--kant:#2A2836;--aksent:#5EE6D6;--varsel:#F5A524;
+  --vis:'Archivo','Arial Narrow',system-ui,sans-serif;--kropp:'Montserrat',system-ui,sans-serif;--grad:linear-gradient(110deg,#15D8C4,#5B8BFF 50%,#C21FBF)}
+*{box-sizing:border-box}body{margin:0;background:var(--bunn);color:var(--tekst);font:500 16px/1.5 var(--kropp)}
+.side{max-width:560px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:18px}
+.merke{align-self:flex-start;padding:4px 12px;border-radius:999px;background:var(--varsel);color:#111;font:800 12px/1.2 var(--kropp);letter-spacing:.06em}
+h1{margin:0;font:900 clamp(40px,11vw,60px)/.95 var(--vis);font-stretch:78%;text-wrap:balance}
+.lede{margin:0;color:var(--dempet);max-width:60ch}
+.liste{display:flex;flex-direction:column;gap:10px}
+.valg{display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:18px;background:var(--flate);border:1.5px solid var(--kant);color:var(--tekst);text-decoration:none}
+.valg:focus-visible{outline:3px solid var(--aksent);outline-offset:2px}
+.valg b{font:700 18px/1.25 var(--kropp)}.valg span{color:var(--dempet);font-size:14.5px}
+.valg small{color:var(--aksent);font:700 12.5px/1 var(--kropp);letter-spacing:.06em;text-transform:uppercase}
+.valg.hoved{border:0;background:var(--grad);color:#08080B}.valg.hoved span,.valg.hoved small{color:#08080B;opacity:.85}
+.nullstill{align-self:flex-start;min-height:44px;padding:0 18px;border-radius:999px;border:1.5px solid var(--kant);background:transparent;color:var(--tekst);font:700 15px/1 var(--kropp);cursor:pointer}
+#kvitt{margin:0;color:var(--aksent);font-weight:700;min-height:1.5em}
+.merk{margin:0;padding:14px 16px;border-radius:14px;border:1.5px dashed var(--kant);color:var(--dempet);font-size:14.5px}.merk b{color:var(--tekst)}
+</style></head><body>
+<main class="side">
+  <span class="merke">FORHÅNDSVISNING · ikke live</span>
+  <h1>Aimpire neste</h1>
+  <p class="lede">Neste versjon av appen, klar til å prøves på telefonen. Den har egen lagring og rører ikke den ekte appen eller medlemmenes telefoner. Si hva som føles riktig og hva som ikke gjør det.</p>
+  <nav class="liste" aria-label="Prøv">
+    <a class="valg hoved" href="./?l=rehman-nogufl"><small>Nytt medlem</small><b>Jeg fikk lenken din</b><span>Velg språk, ta den korte turen, og se bare det som trengs første gang. Din egen lederlenke brukes.</span></a>
+    <a class="valg" href="./?full=1"><small>Medlem</small><b>Hjem i hele appen</b><span>Invitasjonen og registreringen øverst, så Kom i gang og oppgavene dine. Markedet lenger ned.</span></a>
+    <a class="valg" href="./?full=1#learn"><small>Academy</small><b>Prøv pip-linjalen</b><span>Åpne «Pip» i Academy og dra prisen. Velg EUR/USD eller gull og lot, og se dollar i pluss og minus.</span></a>
+    <a class="valg" href="ledere.html"><small>Leder</small><b>Lederens side</b><span>Verktøykassen først, med lenken din og delingen inni.</span></a>
+  </nav>
+  <button class="nullstill" id="nullstill" type="button">Start på nytt som ny besøkende</button>
+  <p id="kvitt" role="status"></p>
+  <p class="merk"><b>Dette er en testkopi.</b> Registreringsknappen fører til den ekte megleren, så ikke registrer deg her. Del-knappen deler den ekte appen, ikke denne.</p>
+</main>
+<script>
+document.getElementById("nullstill").addEventListener("click", function(){
+  try{ localStorage.clear(); sessionStorage.clear(); }catch(e){}
+  if(navigator.serviceWorker){ navigator.serviceWorker.getRegistrations().then(function(rs){ rs.forEach(function(r){ r.unregister(); }); }); }
+  if(window.caches){ caches.keys().then(function(ks){ ks.forEach(function(k){ caches.delete(k); }); }); }
+  document.getElementById("kvitt").textContent = "Nullstilt. Trykk «Jeg fikk lenken din» for å se førstegangsbesøket.";
+});
+</script></body></html>

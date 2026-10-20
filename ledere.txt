@@ -1,0 +1,2 @@
+# Reserve-liste for godkjente ledere - EN linje per leder: Fornavn | partnerlenke
+# Brukes bare om Google-arket er nede. Tom med vilje; arket er fasit (se GODKJENN-LEDERE.md).

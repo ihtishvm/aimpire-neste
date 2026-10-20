@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aimpire</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{color-scheme:dark}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0B0A10;color:#F4F2F7;font:600 1rem/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;text-align:center;padding:24px;box-sizing:border-box}
+  .w{max-width:360px}
+  b{display:block;font-size:1.5rem;letter-spacing:.02em;margin-bottom:12px;background:linear-gradient(90deg,#15D8C4,#1B4FD8 55%,#C21FBF);-webkit-background-clip:text;background-clip:text;color:transparent}
+  p{margin:0 0 16px;color:rgba(244,242,247,.8)}
+  .r{display:none}
+  button,a{display:inline-block;min-height:44px;padding:10px 18px;border-radius:999px;border:1.5px solid rgba(244,242,247,.25);background:transparent;color:inherit;font:inherit;text-decoration:none;cursor:pointer;margin:4px}
+</style>
+</head>
+<body>
+<div class="w">
+  <b>Aimpire</b>
+  <p id="t">…</p>
+  <div class="r" id="r"><button id="igjen" type="button"></button><a id="hjem" href="/"></a></div>
+</div>
+<script>
+/* #164 (founder 19.10): lederlenken er bare navnet, aimpire.github.io/asma. GitHub Pages viser denne
+   siden for adresser som ikke finnes; den slaar opp navnet i den publiserte fanen «Navnelenker»
+   (slug,code) og sender videre til /?l=kode, med spraak, hash og andre parametre urørt.
+   Finnes ikke navnet (nylig godkjent - Google publiserer paa nytt innen noen minutter), sendes
+   man IKKE til forsiden uten sponsor; man faar beskjed om aa proeve igjen om litt. */
+(function(){
+  var CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCUbvpu8cXdh-V-XkfvqAevZlabu876V-j8HNNd_qJGDOpPhbwVukJa--Vum5QWLuyQwEQM9Y5gMSc/pub?gid=22159740&single=true&output=csv";
+  var SNAP = "slug,code\nasma,pbv4ta\ngehrichupp,hv1a16\nmateenasif,w3qcch\nmilad,844xid\nmisbahmehboob,h6qxd6\nmuhammadimran,29cqk1\nnajma,c6upzs\nrehman,nogufl\nsajidhussein,ulrc2f\n";   /* #169: reserve fra siste bygg - brukes bare naar Google ikke svarer */
+  var q = new URLSearchParams(location.search);
+  /* #169: vask det apper henger paa: «/Asma.», «/asma)», «/asma%E2%80%8B» (usynlig tegn fra WhatsApp),
+     «/asma/» og «/asma/noe». Bare foerste del av stien teller; alt annet enn a-z og 0-9 faller bort. */
+  var raa = String(q.get("s") || location.pathname.replace(/^\/+/, "").split("/")[0] || "");
+  try { raa = decodeURIComponent(raa); } catch (e) {}
+  try { raa = raa.normalize("NFKC"); } catch (e) {}
+  var s = raa.toLowerCase().replace(/[^a-z0-9]/g, "");
+  q.delete("s");
+  var rest = q.toString();
+  var hjem = function(ekstra){ location.replace("/" + (ekstra ? "?" + ekstra : "") + location.hash); };
+  var sp = (q.get("lang") || navigator.language || "en").slice(0, 2).toLowerCase();
+  var T = {
+    en: ["Opening…", "This link is being activated. Try again in a few minutes.", "Try again", "Go to Aimpire"],
+    no: ["Åpner …", "Lenken aktiveres akkurat nå. Prøv igjen om noen minutter.", "Prøv igjen", "Gå til Aimpire"],
+    hi: ["खुल रहा है…", "यह link अभी चालू हो रहा है। कुछ मिनट बाद फिर कोशिश करें।", "फिर कोशिश करें", "Aimpire पर जाएँ"],
+    ur: ["کھل رہا ہے…", "یہ link ابھی فعال ہو رہا ہے۔ چند منٹ بعد دوبارہ کوشش کریں۔", "دوبارہ کوشش کریں", "Aimpire پر جائیں"],
+    ar: ["جارٍ الفتح…", "يتم تفعيل هذا الرابط الآن. حاول مرة أخرى بعد بضع دقائق.", "حاول مرة أخرى", "اذهب إلى Aimpire"]
+  }[sp] || null;
+  if(!T) T = ["Opening…", "This link is being activated. Try again in a few minutes.", "Try again", "Go to Aimpire"];
+  if(sp === "ur" || sp === "ar") document.documentElement.dir = "rtl";
+  document.getElementById("t").textContent = T[0];
+  /* Ikke et navn (f.eks. en gammel fil som er borte): rett til forsiden. */
+  if(!/^[a-z0-9]{1,30}$/.test(s) || CSV.indexOf("http") !== 0){ hjem(rest); return; }
+  /* Sikkerhet: navnet maa staa NOEYAKTIG én gang. Staar det flere ganger (f.eks. etter en
+     haandredigering av fanen), sendes ingen videre - ellers kunne lenken peke til feil leder. */
+  var fant = function(t){
+    var treff = [];
+    String(t || "").split(/\r?\n/).forEach(function(l){ var f = l.split(","); if(f[0] && f[0].trim().toLowerCase() === s) treff.push((f[1] || "").trim().toLowerCase()); });
+    return treff.length === 1 && /^[a-z0-9]{6}$/.test(treff[0]) ? treff[0] : null;
+  };
+  fetch(CSV + (CSV.indexOf("?") < 0 ? "?" : "&") + "t=" + Date.now(), { cache: "no-store" })
+    .then(function(r){ return r.ok ? r.text() : ""; }, function(){ return ""; })
+    .then(function(t){
+      /* Svarte Google (fila har overskriften), gjelder den. Ellers: reservekopien. */
+      var kode = /^slug,code/i.test(String(t || "").trim()) ? fant(t) : fant(SNAP);
+      if(kode){ hjem("l=" + kode + (rest ? "&" + rest : "")); return; }
+      document.getElementById("t").textContent = T[1];
+      var ig = document.getElementById("igjen"), hm = document.getElementById("hjem");
+      ig.textContent = T[2]; ig.onclick = function(){ location.reload(); };
+      hm.textContent = T[3];
+      document.getElementById("r").style.display = "block";
+    })
+    .catch(function(){ document.getElementById("t").textContent = T[1]; document.getElementById("igjen").textContent = T[2]; document.getElementById("igjen").onclick = function(){ location.reload(); }; document.getElementById("hjem").textContent = T[3]; document.getElementById("r").style.display = "block"; });
+})();
+</script>
+</body>
+</html>
